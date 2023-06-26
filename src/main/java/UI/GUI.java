@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Scanner;
 import javaBin.Medico;
 import javaBin.Pessoa;
+import javaBin.Franquia;
+import javaBin.UnidadeFranquia;
+
 
 /**
  *
@@ -97,7 +100,41 @@ public class GUI {
 
         return medico;
     }
-
+    public Franquia CadastraFranquia(Pessoa responsavel){
+        System.out.println("Por favor, informe os dados da Franquia:");
+        Franquia franquia = new Franquia();
+        System.out.println("Nome:");
+        String nome = scan.nextLine();
+        System.out.println("CNPJ:");
+        String cnpj = scan.nextLine();
+        System.out.println("Cidade:");
+        String cidade = scan.nextLine();
+        System.out.println("Endereco:");
+        String endereco = scan.nextLine();
+        franquia.setNome(nome);
+        franquia.setCnpj(cnpj);
+        franquia.setCidade(cidade);
+        franquia.setEndereco(endereco);
+        franquia.setResponsavel(responsavel);
+        return franquia;
+        
+    }
+    
+     public UnidadeFranquia CadastraUnidade(Pessoa responsavel, Franquia franquia){
+        System.out.println("Por favor, informe os dados da Unidade:");
+        UnidadeFranquia unidade = new UnidadeFranquia();
+        System.out.println("Cidade:");
+        String cidade = scan.nextLine();
+        System.out.println("Endereco:");
+        String endereco = scan.nextLine();
+        unidade.setCidade(cidade);
+        unidade.setEndereço(endereco);
+        unidade.setResponsavel(responsavel);
+        unidade.setFranquia(franquia);
+        return unidade;
+        
+    }
+   
     public int pegaOpcaoLoginCadastro() {
 
         System.out.println("1 cadastrar");
@@ -177,6 +214,17 @@ public class GUI {
             System.out.println(medico);
         }
 
+    }
+    public void mostrarFranquias(List<Franquia> franquias){
+        for(Franquia f : franquias){
+            System.out.println(f);
+        }
+    
+    }
+    public void mostrarUnidades(List<UnidadeFranquia> unidades){
+        for(UnidadeFranquia u : unidades){
+            System.out.println(u);
+        }
     }
 
 }
