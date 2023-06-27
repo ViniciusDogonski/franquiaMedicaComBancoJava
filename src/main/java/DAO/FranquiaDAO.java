@@ -89,9 +89,9 @@ public class FranquiaDAO {
                 Franquia novaFranquia = new Franquia();
 
                 //novaFranquia.setResponsavel(null);
-                for(Pessoa p : pessoas){
-                    if(p != null){
-                        if(p.getID() == idResp){
+                for (Pessoa p : pessoas) {
+                    if (p != null) {
+                        if (p.getID() == idResp) {
                             novaFranquia.setResponsavel(p);
                         }
                     }
@@ -106,7 +106,7 @@ public class FranquiaDAO {
                 novaFranquia.setDataCriacao(dataCriacao);
 
                 listaRetorno.add(novaFranquia);
-                
+
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -168,20 +168,65 @@ public class FranquiaDAO {
         return id;
     }
 
+    public List<Franquia> buscaFranquiaPorResponsavel(int responsavelId) { //tem
+        String query = "SELECT * FROM franquia where responsavelId = ?";
+        List<Franquia> franquiasResponsavel = new ArrayList<>();
+
+        try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = createPreparedStatement1(connection, responsavelId); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                String nome = rs.getString("nome");
+                String cnpj = rs.getString("CNPJ");
+                String endereco = rs.getString("endereco");
+                String cidade = rs.getString("cidade");
+                int responsavel = rs.getInt("responsavelId");
+                int franquiaId = rs.getInt("idFranquia");
+
+                Timestamp timestampDataCriacao = Timestamp.valueOf(rs.getString("dataCriacao"));
+                LocalDateTime dtCriacao = timestampDataCriacao.toLocalDateTime();
+                Timestamp timestampDataModificacao = Timestamp.valueOf(rs.getString("dataModificacao"));
+                LocalDateTime dtModificacao = timestampDataModificacao.toLocalDateTime();
+                Franquia franquiaNova = new Franquia();
+                franquiaNova.setId(franquiaId);
+                franquiaNova.setNome(nome);
+                franquiaNova.setCnpj(cnpj);
+                franquiaNova.setCidade(cidade);
+                franquiaNova.setEndereco(endereco);
+                franquiaNova.setDataCriacao(dtCriacao);
+                franquiaNova.setDataModificacao(dtModificacao);
+                franquiaNova.setResponsavel(null);
+                franquiasResponsavel.add(franquiaNova);
+                //
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return franquiasResponsavel;
+    }
+
     public void deleteFranquia(int idFranquia, PessoaDAO pessoaDAO) {
         String sql = "DELETE FROM franquia where idFranquia = ?";
-
         int idResponsavel = this.buscaIdResponsavelFranquia(idFranquia);
-        System.out.println(idResponsavel);
-
+        List<Franquia> franquias = this.buscaFranquiaPorResponsavel(idResponsavel); // VERIFICAR SE O RESPONSAVEL POSSUI MAIS FRANQUIAS
+        
+        for(Franquia f : franquias){
+            System.out.println(f);
+        }
+        // EXCLUIR A FRANQUIA
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
-
-            stmt.setInt(1, idFranquia);
-            stmt.execute();
+            System.out.println(franquias.size());
+            if (franquias.size() == 1) {
+                stmt.setInt(1, idFranquia);
+                stmt.execute();
+                pessoaDAO.alterarTipoPessoaParaNULL(idResponsavel);
+            } else{
+                System.out.println("o responsavel possui mais de uma franquia vinculada");
+                stmt.setInt(1, idFranquia);
+                stmt.execute();
+            }// o arquivo? não tenho =)ata
 
             System.out.println("franquia excluída com sucesso.");
-
-            pessoaDAO.alterarTipoPessoaParaNULL(idResponsavel);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -191,18 +236,17 @@ public class FranquiaDAO {
 
     public Franquia buscaPorID(int code, List<Pessoa> pessoas) {
         Franquia franquia = null;
-        
-       // String sql= "select * from franquia where idFranquia = ?";
+
+        // String sql= "select * from franquia where idFranquia = ?";
         int id = 0;
-        int idResponsavel=0;
+        int idResponsavel = 0;
         String nome = "";
-        String cidade= "";
+        String cidade = "";
         String endereco = "";
         String cnpj = "";
         LocalDateTime dtCriacao = LocalDateTime.now();
-        LocalDateTime dtModificacao = LocalDateTime.now();
-       
-        
+        LocalDateTime dtModificacao = LocalDateTime.now();//
+
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = createPreparedStatement(connection, code); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
@@ -216,7 +260,7 @@ public class FranquiaDAO {
                 int idResp = rs.getInt("responsavelId");
 
                 Timestamp timestampDataCriacao = Timestamp.valueOf(rs.getString("dataCriacao"));
-                dtCriacao= timestampDataCriacao.toLocalDateTime();
+                dtCriacao = timestampDataCriacao.toLocalDateTime();
                 Timestamp timestampDataModificacao = Timestamp.valueOf(rs.getString("dataModificacao"));
                 dtModificacao = timestampDataModificacao.toLocalDateTime();
 
@@ -245,7 +289,13 @@ public class FranquiaDAO {
     }
 
     private PreparedStatement createPreparedStatement(Connection con, long id) throws SQLException {
-        String sql = "select * from franquia where idFranquia = ?";
+        String sql = "select * from franquia where idFranquia = ?"; // 
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setLong(1, id);
+        return ps;
+    }
+     private PreparedStatement createPreparedStatement1(Connection con, long id) throws SQLException {
+        String sql = "select * from franquia where responsavelId = ?"; // 
         PreparedStatement ps = con.prepareStatement(sql);
         ps.setLong(1, id);
         return ps;

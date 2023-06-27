@@ -320,7 +320,7 @@ public class PessoaDAO {
     }
 
     public void alterarTipoPessoaParaNULL(int id) {
-
+        
         String sql = " UPDATE pessoa SET"
                 + "        tipoUsuarioId = NULL,"
                 + "        dataModificacao = ?"

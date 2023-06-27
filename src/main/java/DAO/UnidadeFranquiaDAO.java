@@ -4,7 +4,6 @@
  */
 package DAO;
 
-
 import connection.ConnectionFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -168,17 +167,17 @@ public class UnidadeFranquiaDAO {
         return unidadeAlterada;
 
     }
-    public  UnidadeFranquia buscarUnidade(int code, List<Franquia> franquias, List<Pessoa> pessoas){
-        String sql= "select * from unidade where idUnidade = ?";
+
+    public UnidadeFranquia buscarUnidade(int code, List<Franquia> franquias, List<Pessoa> pessoas) {
+        String sql = "select * from unidade where idUnidade = ?";
         int id = 0;
-        int franquiaId =0;
-        int idResponsavel=0;
-        String cidade= "";
+        int franquiaId = 0;
+        int idResponsavel = 0;
+        String cidade = "";
         String endereco = "";
         LocalDateTime dtCriacao = LocalDateTime.now();
         LocalDateTime dtModificacao = LocalDateTime.now();
-       
-        
+
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, code);
             try (ResultSet rs = ps.executeQuery()) {
@@ -188,42 +187,43 @@ public class UnidadeFranquiaDAO {
                     idResponsavel = rs.getInt("resposavelId");
                     cidade = rs.getString("cidade");
                     endereco = rs.getString("endereco");
-                     Timestamp timestampDataCriacao = Timestamp.valueOf(rs.getString("dataCriacao"));
+                    Timestamp timestampDataCriacao = Timestamp.valueOf(rs.getString("dataCriacao"));
                     dtCriacao = timestampDataCriacao.toLocalDateTime();
                     Timestamp timestampDataModificacao = Timestamp.valueOf(rs.getString("dataModificacao"));
                     dtModificacao = timestampDataModificacao.toLocalDateTime();
-                    
+
                 }
-                
+
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         UnidadeFranquia unidade = new UnidadeFranquia();
-                unidade.setId(id);
-                unidade.setCidade(cidade);
-                unidade.setEndereco(endereco);
-                unidade.setDataCriacao(dtCriacao);
-                unidade.setDataModificacao(dtModificacao);
-                for(Franquia franquia : franquias){
-                    if(franquia!=null){
-                        if(franquia.getId() == franquiaId){
-                            unidade.setFranquia(franquia);
-                        }
-                    }
+        unidade.setId(id);
+        unidade.setCidade(cidade);
+        unidade.setEndereco(endereco);
+        unidade.setDataCriacao(dtCriacao);
+        unidade.setDataModificacao(dtModificacao);
+        for (Franquia franquia : franquias) {
+            if (franquia != null) {
+                if (franquia.getId() == franquiaId) {
+                    unidade.setFranquia(franquia);
                 }
-                for(Pessoa p  : pessoas){
-                    if(p != null){
-                        if(p.getId() == idResponsavel){
-                            unidade.setResponsavel(p);
-                        }
-                    }
+            }
+        }
+        for (Pessoa p : pessoas) {
+            if (p != null) {
+                if (p.getId() == idResponsavel) {
+                    unidade.setResponsavel(p);
                 }
-                
+            }
+        }
+
         return unidade;
-    
+
     }
-    public int BuscarIdResponsavelUnidade(int idUnidade, List<Franquia> franquias){
+
+    /*public int BuscarIdResponsavelUnidade(int idUnidade, List<Franquia> franquias){
         String sql = "select * from unidade where idUnidade = ?";
         int id = 0;
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -237,7 +237,7 @@ public class UnidadeFranquiaDAO {
             throw new RuntimeException(e);
         }
         return id;
-    }
+    }*/
     public int buscaIdResponsavelUnidade(int code) {
         String sql = "select * from unidade where idUnidade = ?";
         int id = 0;
@@ -253,28 +253,76 @@ public class UnidadeFranquiaDAO {
         }
         return id;
     }
-    public void deleteUnidade(int idUnidade,PessoaDAO pessoaDAO){
+
+    public List<UnidadeFranquia> buscaUnidadePorResponsavel(int responsavelId) { //tem
+        String query = "SELECT * FROM unidade where responsavelId = ?";
+        List<UnidadeFranquia> unidadesResponsavel = new ArrayList<>();
+
+        try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = createPreparedStatement1(connection, responsavelId); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                String nome = rs.getString("nome");
+                String cnpj = rs.getString("CNPJ");
+                String endereco = rs.getString("endereco");
+                String cidade = rs.getString("cidade");
+                int idUnidade = rs.getInt("idUnidade");
+                int responsavel = rs.getInt("responsavelId");
+                int franquiaId = rs.getInt("idFranquia");
+
+                Timestamp timestampDataCriacao = Timestamp.valueOf(rs.getString("dataCriacao"));
+                LocalDateTime dtCriacao = timestampDataCriacao.toLocalDateTime();
+                Timestamp timestampDataModificacao = Timestamp.valueOf(rs.getString("dataModificacao"));
+                LocalDateTime dtModificacao = timestampDataModificacao.toLocalDateTime();
+                UnidadeFranquia uniNova = new UnidadeFranquia();
+                uniNova.setFranquia(null);
+                uniNova.setResponsavel(null);
+
+                uniNova.setCidade(cidade);
+                uniNova.setEndereco(endereco);
+                uniNova.setDataCriacao(dtCriacao);
+                uniNova.setDataModificacao(dtModificacao);
+
+                unidadesResponsavel.add(uniNova);
+                //
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return unidadesResponsavel;
+    }
+
+    public void deleteUnidade(int idUnidade, PessoaDAO pessoaDAO) {
         String sql = "DELETE FROM unidade where idUnidade = ?";
         int idResponsavel = this.buscaIdResponsavelUnidade(idUnidade);
- 
+        List<UnidadeFranquia> unidades = this.buscaUnidadePorResponsavel(idResponsavel); // VERIFICAR SE O RESPONSAVEL POSSUI MAIS UNIDADES
 
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-            stmt.setInt(1, idUnidade);
-            stmt.execute();
+            //System.out.println(unidades.size());
+            if (unidades.size() == 1) {
+                stmt.setInt(1, idUnidade);
+                stmt.execute();
+                pessoaDAO.alterarTipoPessoaParaNULL(idResponsavel);
+            } else {
+                System.out.println("o responsavel possui mais de uma unidade vinculada");
+                stmt.setInt(1, idUnidade);
+                stmt.execute();
+            }// o arquivo? não tenho =)ata
 
             System.out.println("unidade excluída com sucesso.");
-
-            pessoaDAO.alterarTipoPessoaParaNULL(idResponsavel);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
     }
-    /*public void excluiUnidade(int idUnidade, List<Franquia> franquias){
-        String sql = "drop from unidade where idUnidade = ?";
-        
-    }*/
+
+    private PreparedStatement createPreparedStatement1(Connection con, long id) throws SQLException {
+        String sql = "select * from unidade where responsavelId = ?"; // 
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setLong(1, id);
+        return ps;
+    }
 
 }
