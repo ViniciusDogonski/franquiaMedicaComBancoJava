@@ -261,13 +261,12 @@ public class UnidadeFranquiaDAO {
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = createPreparedStatement1(connection, responsavelId); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                String nome = rs.getString("nome");
-                String cnpj = rs.getString("CNPJ");
+                
                 String endereco = rs.getString("endereco");
                 String cidade = rs.getString("cidade");
                 int idUnidade = rs.getInt("idUnidade");
                 int responsavel = rs.getInt("responsavelId");
-                int franquiaId = rs.getInt("idFranquia");
+                int franquiaId = rs.getInt("franquiaId");
 
                 Timestamp timestampDataCriacao = Timestamp.valueOf(rs.getString("dataCriacao"));
                 LocalDateTime dtCriacao = timestampDataCriacao.toLocalDateTime();
