@@ -117,7 +117,7 @@ public class FranquiaDAO {
     }
 
     public Franquia editarFranquia(Franquia franquia) {
-        String sql = " UPDATE medico SET"
+        String sql = " UPDATE franquia SET"
                 + "       nome = ?,"
                 + "       CNPJ = ?,"
                 + "       cidade = ?,"
@@ -191,22 +191,34 @@ public class FranquiaDAO {
 
     public Franquia buscaPorID(int code, List<Pessoa> pessoas) {
         Franquia franquia = null;
+        
+       // String sql= "select * from franquia where idFranquia = ?";
+        int id = 0;
+        int idResponsavel=0;
+        String nome = "";
+        String cidade= "";
+        String endereco = "";
+        String cnpj = "";
+        LocalDateTime dtCriacao = LocalDateTime.now();
+        LocalDateTime dtModificacao = LocalDateTime.now();
+       
+        
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = createPreparedStatement(connection, code); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 franquia = new Franquia();
                 //nome, cnpj, cidade, endereco,CPF,dataCriacao,dataModificacao
-                int id = rs.getInt("idFranquia");
-                String nome = rs.getString("nome");
-                String cidade = rs.getString("cidade");
-                String endereco = rs.getString("endereco");
-                String cnpj = rs.getString("CNPJ");
+                id = rs.getInt("idFranquia");
+                nome = rs.getString("nome");
+                cidade = rs.getString("cidade");
+                endereco = rs.getString("endereco");
+                cnpj = rs.getString("CNPJ");
                 int idResp = rs.getInt("responsavelId");
 
                 Timestamp timestampDataCriacao = Timestamp.valueOf(rs.getString("dataCriacao"));
-                LocalDateTime dataCriacao = timestampDataCriacao.toLocalDateTime();
+                dtCriacao= timestampDataCriacao.toLocalDateTime();
                 Timestamp timestampDataModificacao = Timestamp.valueOf(rs.getString("dataModificacao"));
-                LocalDateTime dataModificacao = timestampDataModificacao.toLocalDateTime();
+                dtModificacao = timestampDataModificacao.toLocalDateTime();
 
                 //pessoaBuscada.setTipoUsuario(null);
                 for (Pessoa p : pessoas) {
@@ -222,8 +234,8 @@ public class FranquiaDAO {
                 franquia.setEndereco(endereco);
                 franquia.setCidade(cidade);
                 franquia.setCnpj(cnpj);
-                franquia.setDataCriacao(dataCriacao);
-                franquia.setDataModificacao(dataModificacao);
+                franquia.setDataCriacao(dtCriacao);
+                franquia.setDataModificacao(dtModificacao);
 
             }
         } catch (SQLException e) {
@@ -233,10 +245,11 @@ public class FranquiaDAO {
     }
 
     private PreparedStatement createPreparedStatement(Connection con, long id) throws SQLException {
-        String sql = "select * from franquia where id = ?";
+        String sql = "select * from franquia where idFranquia = ?";
         PreparedStatement ps = con.prepareStatement(sql);
         ps.setLong(1, id);
         return ps;
     }
+
 
 }

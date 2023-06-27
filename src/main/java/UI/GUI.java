@@ -128,7 +128,7 @@ public class GUI {
         System.out.println("Endereco:");
         String endereco = scan.nextLine();
         unidade.setCidade(cidade);
-        unidade.setEndereço(endereco);
+        unidade.setEndereco(endereco);
         unidade.setResponsavel(responsavel);
         unidade.setFranquia(franquia);
         return unidade;

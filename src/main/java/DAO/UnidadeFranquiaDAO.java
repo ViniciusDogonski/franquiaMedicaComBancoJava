@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLOutput;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class UnidadeFranquiaDAO {
             // seta os valores
             stmt.setInt(1, unidade.getFranquia().getId());
             stmt.setString(2, unidade.getCidade());
-            stmt.setString(3, unidade.getEndereço());
+            stmt.setString(3, unidade.getEndereco());
             stmt.setInt(4, unidade.getResponsavel().getID());
 
             Timestamp timestamp = Timestamp.valueOf(unidade.getDataCriacao());
@@ -117,7 +118,7 @@ public class UnidadeFranquiaDAO {
                         }
                     }
                 }
-                novaUnidade.setEndereço(endereco);
+                novaUnidade.setEndereco(endereco);
                 novaUnidade.setCidade(cidade);
 
                 novaUnidade.setDataModificacao(dataModificacao);
@@ -142,13 +143,13 @@ public class UnidadeFranquiaDAO {
                 + "       endereco = ?,"
                 + "       dataModificacao = ?"
                 + "       WHERE idUnidade = ?";
-
+        System.out.println(unidadeAlterada);
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setInt(1, unidadeAlterada.getFranquia().getId());
             stmt.setInt(2, unidadeAlterada.getResponsavel().getID());
             stmt.setString(3, unidadeAlterada.getCidade());
-            stmt.setString(4, unidadeAlterada.getEndereço());
+            stmt.setString(4, unidadeAlterada.getEndereco());
 
             Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
             java.sql.Date sqlDate = new java.sql.Date(timestamp.getTime());
@@ -201,7 +202,7 @@ public class UnidadeFranquiaDAO {
         UnidadeFranquia unidade = new UnidadeFranquia();
                 unidade.setId(id);
                 unidade.setCidade(cidade);
-                unidade.setEndereço(endereco);
+                unidade.setEndereco(endereco);
                 unidade.setDataCriacao(dtCriacao);
                 unidade.setDataModificacao(dtModificacao);
                 for(Franquia franquia : franquias){
@@ -253,9 +254,9 @@ public class UnidadeFranquiaDAO {
         return id;
     }
     public void deleteUnidade(int idUnidade,PessoaDAO pessoaDAO){
-        String sql = "DELEE FROM unidade where idUnidade = ?";
+        String sql = "DELETE FROM unidade where idUnidade = ?";
         int idResponsavel = this.buscaIdResponsavelUnidade(idUnidade);
-        System.out.println(idResponsavel);
+ 
 
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 

@@ -16,7 +16,7 @@ public class UnidadeFranquia {
     private int id;
     private Franquia franquia;
     private String cidade;
-    private String endereço;
+    private String endereco;
     private Pessoa responsavel;
     private LocalDateTime dataCriacao; 
     private LocalDateTime dataModificacao;
@@ -48,12 +48,12 @@ public class UnidadeFranquia {
         this.cidade = cidade;
     }
 
-    public String getEndereço() {
-        return endereço;
+    public String getEndereco() {
+        return endereco;
     }
 
-    public void setEndereço(String endereço) {
-        this.endereço = endereço;
+    public void setEndereco(String endereco) {
+        this.endereco = endereco;
     }
 
     public Pessoa getResponsavel() {
@@ -82,7 +82,13 @@ public class UnidadeFranquia {
 
     @Override
     public String toString() {
-        return "UnidadeFranquia{" + "id=" + id + ", franquia=" + franquia + ", cidade=" + cidade + ", endere\u00e7o=" + endereço + ", responsavel=" + responsavel + ", dataCriacao=" + dataCriacao + ", dataModificacao=" + dataModificacao + '}';
+        return "UnidadeFranquia{" + "id=" + id + "," + "\n "
+                + ",franquia=" + franquia + "," + "\n "+
+                ", cidade=" + cidade  + ","+ "\n "+ 
+        " endereco=" + endereco + ","+ "\n "+
+        "responsavel=" + responsavel + "," + "\n "
+        + "dataCriacao=" + dataCriacao + "," + "\n "
+        +"dataModificacao=" + dataModificacao + '}' + "\n";
     }
 
 
@@ -105,7 +111,7 @@ public class UnidadeFranquia {
         if (!Objects.equals(this.cidade, other.cidade)) {
             return false;
         }
-        if (!Objects.equals(this.endereço, other.endereço)) {
+        if (!Objects.equals(this.endereco, other.endereco)) {
             return false;
         }
         if (!Objects.equals(this.franquia, other.franquia)) {

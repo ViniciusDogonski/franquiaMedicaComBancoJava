@@ -32,11 +32,11 @@ import javaBin.UnidadeFranquia;
  * @author Vinicius Augusto
  */
 public class Progama {
-    
+
     ConnectionFactory c = new ConnectionFactory();
     TipoPessoaDAO tipoPessoaDAO = new TipoPessoaDAO();
     Connection connection = c.getConnection();
-    
+
     Scanner scan = new Scanner(System.in);
     GUI gui = new GUI();
     PessoaDAO pessoaDAO = new PessoaDAO();
@@ -44,11 +44,11 @@ public class Progama {
     FranquiaDAO franquiaDAO = new FranquiaDAO();
     UnidadeFranquiaDAO unidadeFranquiaDAO = new UnidadeFranquiaDAO();
     List<TipoPessoa> tipoUserBanco = tipoPessoaDAO.listarTipos();
-    
+
     public Progama() {
         this.inicioMenu();
     }
-    
+
     public void inicioMenu() {
 
         /* Pessoa pessoaTest = new Pessoa();
@@ -68,7 +68,7 @@ public class Progama {
             System.out.println(pessoa);
         }*/
         int op = gui.pegaOpcaoLoginCadastro();
-        
+
         switch (op) {
             case 1:
                 System.out.println("------ CADASTRO ------");
@@ -78,10 +78,10 @@ public class Progama {
                         pessoaCadastro.setTipoUsuario(tipoPessoa);
                     }
                 }
-                
+
                 System.out.println(pessoaCadastro);
                 pessoaDAO.addPessoaComTipo(pessoaCadastro);
-                
+
                 inicioMenu();
                 break;
             case 2:
@@ -95,19 +95,19 @@ public class Progama {
             default:
                 throw new AssertionError();
         }
-        
+
     }
-    
+
     public void login(String log, String senha) {
-        
+
         Pessoa pessoaAchada = pessoaDAO.acharPessoaPorLoginSenha(log, senha, tipoUserBanco);
-        
+
         if (pessoaAchada == null) {
             System.out.println("Login inválido.");
             return;
         } else {
             System.out.println(pessoaAchada);
-            
+
             switch (pessoaAchada.getTipoUsuario().getTipo()) {
                 case "PACIENTE":
                     System.out.println("menu PACIENTE");
@@ -128,20 +128,20 @@ public class Progama {
                     System.out.println("menu ADM");
                     admMenu();
                     break;
-                
+
                 default:
                     System.out.println("Tipo de usuário inválido.");
             }
-            
+
         }
     }
-    
+
     public void admMenu() {
         int opcaoUsuario;
-        
+
         do {
             opcaoUsuario = gui.pegaOpcaoADM();
-            
+
             switch (opcaoUsuario) {
                 case 1:
                     System.out.println("------ Criar Pessoa ------");
@@ -155,133 +155,146 @@ public class Progama {
                 case 3:
                     System.out.println("------ Editar Pessoa------");
                     int idEdit = 0;
-                    
+
                     System.out.print("id da pessoa:");
                     idEdit = Integer.parseInt(scan.nextLine());
-                    
+
                     Pessoa pessoaAchada = pessoaDAO.buscaPorID(idEdit, tipoUserBanco);
                     Pessoa pessoaEdit = gui.cadastrarPessoa();
-                    
+
                     pessoaEdit.setId(pessoaAchada.getID());
                     pessoaEdit.setTipoUsuario(pessoaAchada.getTipoUsuario());
-                    
+
                     pessoaDAO.alterarPessoa(pessoaEdit);
-                    
+
                     break;
                 case 4:
-                    
+
                     System.out.println("------ Delete Pessoa------");
-                    
+
                     System.out.print("id da pessoa:");
                     int idDel = Integer.parseInt(scan.nextLine());
-                    
+
                     pessoaDAO.excluirPessoa(idDel);
-                    
+
                     break;
                 case 5:
                     System.out.println("------ Criar Medico ------");
-                    
+
                     List<Pessoa> listaNull = pessoaDAO.buscaPorTipoUserNULL();
                     gui.mostrarPessoas(listaNull);
-                    
+
                     System.out.print("id da pessoa:");
                     int idPessoaMedico = Integer.parseInt(scan.nextLine());
-                    
+
                     Pessoa pessoaMedicoAchada = pessoaDAO.buscaPorID(idPessoaMedico, tipoUserBanco);
                     System.out.println(pessoaMedicoAchada);
-                    
+
                     Medico medicoCriado = gui.cadastrarMedico(pessoaMedicoAchada);
-                    
+
                     medicoDAO.addMedico(medicoCriado, pessoaDAO, tipoUserBanco);
-                    
+
                     break;
                 case 6:
                     gui.mostrarMedicos(medicoDAO.listaDeMedicos());
-                    
+
                     break;
                 case 7:
                     System.out.println("------ excluir Medico ------");
-                    
+
                     System.out.print("id da Medico:");
                     int idMedico = Integer.parseInt(scan.nextLine());
-                    
+
                     medicoDAO.excluirMedico(idMedico, pessoaDAO);
-                    
+
                     break;
                 case 8:
                     System.out.println("------ editar Medico ------");
-                    
+
                     System.out.print("id da Medico:");
                     int idMedicoEdit = Integer.parseInt(scan.nextLine());
-                    
+
                     System.out.print("id da pessoa:");
                     int idPessoaMedicoEdit = Integer.parseInt(scan.nextLine());
-                    
+
                     Pessoa pessoaMedicoAchadaEdit = pessoaDAO.buscaPorID(idPessoaMedicoEdit, tipoUserBanco);
                     System.out.println(pessoaMedicoAchadaEdit);
-                    
+
                     Medico medicoCriadoEdit = gui.cadastrarMedico(pessoaMedicoAchadaEdit);
                     medicoCriadoEdit.setId(idMedicoEdit);
-                    
+
                     medicoDAO.alterarMedico(medicoCriadoEdit);
-                    
+
                     break;
                 case 9:
                     System.out.println("------ CADASTRAR FRANQUIA ------");
                     gui.mostrarPessoas(pessoaDAO.listaDePessoas(tipoUserBanco));
                     System.out.println("Informe o id do Responsavel pela Franquia:");
-                    int idResp=0;
+                    int idResp = 0;
                     idResp = Integer.parseInt(scan.nextLine());
                     Pessoa responsavel = pessoaDAO.buscaPorID(idResp, tipoUserBanco);
-                    
+
                     franquiaDAO.addFranquia(gui.CadastraFranquia(responsavel), pessoaDAO, tipoUserBanco);
                     break;
-                case 10: 
+                case 10:
                     System.out.println("FRANQUIAS:");
                     gui.mostrarFranquias(franquiaDAO.listaDeFranquias(pessoaDAO.listaDePessoas(tipoUserBanco)));
                     break;
-                case 11: 
-                    System.out.println("--------Editar franquia:-------");
-                    System.out.println("Informe o id da Franquia:");
-                    int idFranquiaNova = Integer.parseInt(scan.nextLine());
-                    System.out.println("Informe o id do responsavel");
-                    int idResponsavel=0;
-                    idResponsavel = Integer.parseInt(scan.nextLine());
-                    Pessoa responsavelNovo = pessoaDAO.buscaPorID(idResponsavel, tipoUserBanco);
-                    Franquia franquiaNova = gui.CadastraFranquia(responsavelNovo);
-                    franquiaNova.setId(idFranquiaNova);
-                    franquiaDAO.editarFranquia(franquiaNova);
-                    break;
-                case 12 : 
+                case 11:
                     System.out.println("--------DELETE FRANQUIA:--------");
                     System.out.println("Por favor, informe o id da franquia:");
                     int franquiaId = Integer.parseInt(scan.nextLine());
                     franquiaDAO.deleteFranquia(franquiaId, pessoaDAO);
                     break;
-                case 13: 
+
+                case 12:
+                    System.out.println("--------Editar franquia:-------");
+                    System.out.println("Informe o id da Franquia:");
+                    int idFranquiaNova = Integer.parseInt(scan.nextLine());
+                    System.out.println("Informe o id do responsavel");
+                    int idResponsavel = 0;
+                    idResponsavel = Integer.parseInt(scan.nextLine());
+                    Pessoa responsavelNovo = pessoaDAO.buscaPorID(idResponsavel, tipoUserBanco);
+                    Franquia franquiaNova = gui.CadastraFranquia(responsavelNovo);
+                    franquiaNova.setId(idFranquiaNova);
+
+                    franquiaDAO.editarFranquia(franquiaNova);
+                    break;
+
+                case 13:
                     System.out.println("--------CADASTRAR UNIDADE DE FRANQUIA: ----------");
-                    int responsaUnid =0;
+                    int responsaUnid = 0;
                     gui.mostrarPessoas(pessoaDAO.listaDePessoas(tipoUserBanco));
                     System.out.println("Por favor, informe o id do responsavel:");
                     responsaUnid = Integer.parseInt(scan.nextLine());
                     Pessoa respUnidade = pessoaDAO.buscaPorID(responsaUnid, tipoUserBanco);
                     System.out.println("Por favor, informe o id da franquia:");
-                    int franId =0;
-                    franId= Integer.parseInt(scan.nextLine());
+                    int franId = 0;
+                    franId = Integer.parseInt(scan.nextLine());
                     Franquia franquiaUnid = franquiaDAO.buscaPorID(franId, pessoaDAO.listaDePessoas(tipoUserBanco));
-                    unidadeFranquiaDAO.addUnidade(gui.CadastraUnidade(respUnidade, franquiaUnid), pessoaDAO,tipoUserBanco);
-                    
+                    UnidadeFranquia unidade = gui.CadastraUnidade(respUnidade, franquiaUnid);
+                    System.out.println("endereco: " + unidade.getEndereco());
+
+                    unidadeFranquiaDAO.addUnidade(unidade, pessoaDAO, tipoUserBanco);
+
                     break;
                 case 14:
                     System.out.println("-------MOSTRAR UNIDADES:---------");
-                    gui.mostrarUnidades(unidadeFranquiaDAO.listaDeUnidades(franquiaDAO.listaDeFranquias(pessoaDAO.listaDePessoas(tipoUserBanco)), pessoaDAO.listaDePessoas(tipoUserBanco)));
+                    List<Franquia> franquias = franquiaDAO.listaDeFranquias(pessoaDAO.listaDePessoas(tipoUserBanco));
+                    List<Pessoa> pessoas = pessoaDAO.listaDePessoas(tipoUserBanco);
+                    gui.mostrarUnidades(unidadeFranquiaDAO.listaDeUnidades(franquias, pessoas));
                     break;
                 case 15:
+                    System.out.println("--------DELETE UNIDADE --------");
+                    System.out.println("Por favor, informe o id da Unidade");
+                    int idUnidel = Integer.parseInt(scan.nextLine());
+                    unidadeFranquiaDAO.deleteUnidade(idUnidel, pessoaDAO);
+                    break;
+                case 16:
                     System.out.println("-------EDITAR UNIDADE:");
                     int idUnidade = 0;
                     System.out.println("Por favor, informe o id da unidade");
-                    idUnidade= Integer.parseInt(scan.nextLine());
-                    
+                    idUnidade = Integer.parseInt(scan.nextLine());
                     gui.mostrarFranquias(franquiaDAO.listaDeFranquias(pessoaDAO.listaDePessoas(tipoUserBanco)));
                     System.out.println("Informe o id da franquia");
                     int idFranquiaUnidNova = Integer.parseInt(scan.nextLine());
@@ -289,28 +302,24 @@ public class Progama {
                     gui.mostrarPessoas(pessoaDAO.listaDePessoas(tipoUserBanco));
                     System.out.println("informe o id do responsavel pela unidade:");
                     int idRespUnidNova = Integer.parseInt(scan.nextLine());
-                    Pessoa responsaUnidNova = pessoaDAO.buscaPorID(idRespUnidNova,tipoUserBanco);
-                    UnidadeFranquia unidadeNova= gui.CadastraUnidade(responsaUnidNova, fraquiaUnidNova);
+                    Pessoa responsaUnidNova = pessoaDAO.buscaPorID(idRespUnidNova, tipoUserBanco);
+                    UnidadeFranquia unidadeNova = gui.CadastraUnidade(responsaUnidNova, fraquiaUnidNova);
+                    unidadeNova.setId(idUnidade);
+                   // System.out.println("endereco:" + unidadeNova.getEndereco() + "cidade:" + unidadeNova.getCidade());
+                    unidadeFranquiaDAO.alterarUnidade(unidadeNova);
                     break;
-                case 16:
-                    System.out.println("--------DELETE UNIDADE --------");
-                    System.out.println("Por favor, informe o id da Unidade");
-                    int idUnidel = Integer.parseInt(scan.nextLine());
-                    unidadeFranquiaDAO.deleteUnidade(idUnidel, pessoaDAO);
-                    break;
-                   
                 case 0:
                     inicioMenu();
                     break;
                 default:
                     throw new AssertionError();
             }
-            
+
         } while (opcaoUsuario != 0);
     }
-    
+
     public static void main(String[] args) {
         new Progama();
     }
-    
+
 }

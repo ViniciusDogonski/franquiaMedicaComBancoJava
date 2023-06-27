@@ -88,7 +88,14 @@ public class Franquia {
 
     @Override
     public String toString() {
-        return "Franquia{"+"id:" + id + "nome=" + nome + ", cnpj=" + cnpj + ", cidade=" + cidade + ", endere\u00e7o=" + endereco + ", responsavel=" + responsavel + ", dataCriacao=" + dataCriacao + ", dataModificacao=" + dataModificacao + '}';
+        return "Franquia{"+"id:" + id  + ","+ "\n "
+        + "nome=" + nome + "," + "\n "
+        + ", cnpj=" + cnpj  + "," + "\n "+
+        ", cidade=" + cidade + "," + "\n "+
+        ", endereco=" + endereco + "," + "\n "
+        + ", responsavel=" + responsavel  + "," + "\n "
+        +", dataCriacao=" + dataCriacao + "," + "\n "
+        +", dataModificacao=" + dataModificacao  + "," + '}' + "\n";
     }
 
     @Override
