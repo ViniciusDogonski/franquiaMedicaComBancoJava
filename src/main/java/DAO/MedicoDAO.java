@@ -61,6 +61,44 @@ public class MedicoDAO {
 
     }
 
+    
+     public Medico buscarMedicoPorID(int code) {
+
+        String sql = "select * from medico where idMedico = ?";
+        Medico medicoAchado = null;
+        try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, code);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    // id = rs.getInt("pessoaId");
+
+                    int id = rs.getInt("idMedico");
+                    String crm = rs.getString("CRM");
+                    String especialidade = rs.getString("especialidade");
+
+                    Timestamp timestampDataCriacao = Timestamp.valueOf(rs.getString("dataCriacao"));
+                    LocalDateTime dataCriacao = timestampDataCriacao.toLocalDateTime();
+                    Timestamp timestampDataModificacao = Timestamp.valueOf(rs.getString("dataModificacao"));
+                    LocalDateTime dataModificacao = timestampDataModificacao.toLocalDateTime();
+
+                    medicoAchado = new Medico();
+
+                    medicoAchado.setPessoa(null);
+                    medicoAchado.setId(id);
+                    medicoAchado.setCrm(crm);
+                    medicoAchado.setEspecialidade(especialidade);
+                    medicoAchado.setDataModificacao(dataModificacao);
+                    medicoAchado.setDataCriacao(dataCriacao);
+                
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return medicoAchado;
+
+    }
+    
     public List<Medico> listaDeMedicos() {
 
         List<Medico> listaRetorno = new ArrayList<>();

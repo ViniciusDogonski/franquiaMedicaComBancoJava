@@ -4,14 +4,18 @@
  */
 package UI;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
+import javaBin.Consulta;
+import javaBin.EstadoConsulta;
 import javaBin.Medico;
 import javaBin.Pessoa;
 import javaBin.Franquia;
 import javaBin.UnidadeFranquia;
-
 
 /**
  *
@@ -100,7 +104,8 @@ public class GUI {
 
         return medico;
     }
-    public Franquia CadastraFranquia(Pessoa responsavel){
+
+    public Franquia CadastraFranquia(Pessoa responsavel) {
         System.out.println("Por favor, informe os dados da Franquia:");
         Franquia franquia = new Franquia();
         System.out.println("Nome:");
@@ -117,10 +122,10 @@ public class GUI {
         franquia.setEndereco(endereco);
         franquia.setResponsavel(responsavel);
         return franquia;
-        
+
     }
-    
-     public UnidadeFranquia CadastraUnidade(Pessoa responsavel, Franquia franquia){
+
+    public UnidadeFranquia CadastraUnidade(Pessoa responsavel, Franquia franquia) {
         System.out.println("Por favor, informe os dados da Unidade:");
         UnidadeFranquia unidade = new UnidadeFranquia();
         System.out.println("Cidade:");
@@ -132,9 +137,53 @@ public class GUI {
         unidade.setResponsavel(responsavel);
         unidade.setFranquia(franquia);
         return unidade;
-        
+
     }
-   
+
+    public Consulta cadastrarConsulta(Medico medico, Pessoa paciente, List<EstadoConsulta> estadosConsulta, int idUnidae) {
+
+        System.out.println("Por favor, informe os dados da Consulta:");
+        Consulta consulta = new Consulta();
+
+        System.out.print("data da consulta (dd/MM/yyyy):");
+        String dataConsulta = scan.nextLine();
+        LocalDate data = DateConverter(dataConsulta);
+
+        System.out.print("hora da consulta (HH:mm):");
+        String horaConsulta = scan.nextLine();
+        LocalTime horario = TimeConverter(horaConsulta);
+
+        LocalDateTime localDateTime = data.atTime(horario);
+
+        consulta.setDataHora(localDateTime);
+
+        //consulta.setDataHora(LocalDateTime.MAX);
+        System.out.print("Valor da consulta (10.00):");
+        double valor = Double.parseDouble(scan.nextLine());
+
+        //consulta.setEstado(Estados.AGENDADA);
+        for (EstadoConsulta estadoConsulta : estadosConsulta) {
+            System.out.println(estadoConsulta);
+        }
+
+        int idEstado = Integer.parseInt(scan.nextLine());
+
+        EstadoConsulta estado = new EstadoConsulta(idEstado, null);
+
+        consulta.setEstado(estado);
+
+        UnidadeFranquia unidade = new UnidadeFranquia();
+        unidade.setId(idUnidae);
+
+        consulta.setMedico(medico);
+        consulta.setPaciente(paciente);
+        consulta.setValor(valor);
+        consulta.setUnidade(unidade);
+
+        return consulta;
+
+    }
+
     public int pegaOpcaoLoginCadastro() {
 
         System.out.println("1 cadastrar");
@@ -215,16 +264,36 @@ public class GUI {
         }
 
     }
-    public void mostrarFranquias(List<Franquia> franquias){
-        for(Franquia f : franquias){
+
+    public void mostrarFranquias(List<Franquia> franquias) {
+        for (Franquia f : franquias) {
             System.out.println(f);
         }
-    
+
     }
-    public void mostrarUnidades(List<UnidadeFranquia> unidades){
-        for(UnidadeFranquia u : unidades){
+
+    public void mostrarUnidades(List<UnidadeFranquia> unidades) {
+        for (UnidadeFranquia u : unidades) {
             System.out.println(u);
         }
+    }
+
+    public void mostrarConsultas(List<Consulta> consultas) {
+
+        for (Consulta consulta : consultas) {
+            System.out.println(consulta);
+        }
+
+    }
+
+    private LocalDate DateConverter(String dataConsulta) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return LocalDate.parse(dataConsulta, formatter);
+    }
+
+    private LocalTime TimeConverter(String timeString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return LocalTime.parse(timeString, formatter);
     }
 
 }

@@ -4,6 +4,8 @@
  */
 package progama;
 
+import DAO.ConsultaDAO;
+import DAO.EstadoConsultaDAO;
 import DAO.FranquiaDAO;
 import DAO.MedicoDAO;
 import DAO.PessoaDAO;
@@ -21,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import javaBin.Consulta;
+import javaBin.EstadoConsulta;
 import javaBin.Medico;
 import javaBin.Pessoa;
 import javaBin.TipoPessoa;
@@ -43,7 +47,12 @@ public class Progama {
     MedicoDAO medicoDAO = new MedicoDAO();
     FranquiaDAO franquiaDAO = new FranquiaDAO();
     UnidadeFranquiaDAO unidadeFranquiaDAO = new UnidadeFranquiaDAO();
+
+    EstadoConsultaDAO estadoConsultaDAO = new EstadoConsultaDAO();
+    ConsultaDAO consultaDAO = new ConsultaDAO();
+
     List<TipoPessoa> tipoUserBanco = tipoPessoaDAO.listarTipos();
+    List<EstadoConsulta> estadosConsulta = estadoConsultaDAO.listarEstadoConsulta();
 
     public Progama() {
         this.inicioMenu();
@@ -305,8 +314,82 @@ public class Progama {
                     Pessoa responsaUnidNova = pessoaDAO.buscaPorID(idRespUnidNova, tipoUserBanco);
                     UnidadeFranquia unidadeNova = gui.CadastraUnidade(responsaUnidNova, fraquiaUnidNova);
                     unidadeNova.setId(idUnidade);
-                   // System.out.println("endereco:" + unidadeNova.getEndereco() + "cidade:" + unidadeNova.getCidade());
+                    // System.out.println("endereco:" + unidadeNova.getEndereco() + "cidade:" + unidadeNova.getCidade());
                     unidadeFranquiaDAO.alterarUnidade(unidadeNova);
+                    break;
+                case 17:
+                    System.out.println("----------ADD CONSULTA----------");
+
+                    gui.mostrarPessoas(pessoaDAO.listaDePessoasTipoPaciente(tipoUserBanco));
+                    System.out.println("Por favor, informe o id do paciente");
+                    int idPaciente = Integer.parseInt(scan.nextLine());
+
+                    Pessoa pessoaPaciente = pessoaDAO.buscaPorID(idPaciente, tipoUserBanco);
+
+                    gui.mostrarMedicos(medicoDAO.listaDeMedicos());
+                    System.out.println("Por favor, informe o id do paciente");
+                    int idMedicoConsulta = Integer.parseInt(scan.nextLine());
+
+                    Medico medicoConsulta = medicoDAO.buscarMedicoPorID(idMedicoConsulta);
+
+                    List<Pessoa> pessoasList = pessoaDAO.listaDePessoas(tipoUserBanco);
+                    gui.mostrarUnidades(unidadeFranquiaDAO.listaDeUnidades(franquiaDAO.listaDeFranquias(pessoasList), pessoasList));
+                    System.out.println("Por favor, informe o id da unidade");
+                    int idunidade = Integer.parseInt(scan.nextLine());
+
+                    Consulta consultaAdd = gui.cadastrarConsulta(medicoConsulta, pessoaPaciente, estadosConsulta, idunidade);
+
+                    consultaDAO.addConsulta(consultaAdd);
+
+                    break;
+
+                case 18:
+
+                    gui.mostrarConsultas(consultaDAO.listaDeConsultas(estadosConsulta));
+
+                    break;
+                case 19:
+
+                    System.out.println("----------DEL CONSULTA----------");
+                    System.out.println("Por favor, informe o id da consulta");
+                    int idConsulta = Integer.parseInt(scan.nextLine());
+
+                    consultaDAO.excluirConsulta(idConsulta);
+
+                    break;
+                case 20:
+
+                    System.out.println("----------EDIT CONSULTA----------");
+
+                    System.out.println("Por favor, informe o id do consulta");
+                    int idConsultaEdit = Integer.parseInt(scan.nextLine());
+
+                    Consulta consultaAchada = consultaDAO.buscaPorID(idConsultaEdit);
+
+                    gui.mostrarPessoas(pessoaDAO.listaDePessoasTipoPaciente(tipoUserBanco));
+                    System.out.println("Por favor, informe o id do paciente");
+                    int idPacienteConsulta = Integer.parseInt(scan.nextLine());
+
+                    Pessoa pessoaPacienteConsulta = pessoaDAO.buscaPorID(idPacienteConsulta, tipoUserBanco);
+
+                    gui.mostrarMedicos(medicoDAO.listaDeMedicos());
+                    System.out.println("Por favor, informe o id do paciente");
+                    int idMedicoConsultaEdit = Integer.parseInt(scan.nextLine());
+
+                    Medico medicoConsultaAchado = medicoDAO.buscarMedicoPorID(idMedicoConsultaEdit);
+
+                    List<Pessoa> pessoasListedit = pessoaDAO.listaDePessoas(tipoUserBanco);
+                    gui.mostrarUnidades(unidadeFranquiaDAO.listaDeUnidades(franquiaDAO.listaDeFranquias(pessoasListedit), pessoasListedit));
+                    System.out.println("Por favor, informe o id da unidade");
+                    int idunidadeedit = Integer.parseInt(scan.nextLine());
+
+                    Consulta consultaEdit = gui.cadastrarConsulta(medicoConsultaAchado, pessoaPacienteConsulta, estadosConsulta, idunidadeedit);
+                    consultaEdit.setId(consultaAchada.getId());
+                    consultaEdit.setDataCriacao(consultaAchada.getDataCriacao());
+                    consultaEdit.setDataModificacao(LocalDateTime.now());
+
+                    consultaDAO.alterarConsulta(consultaEdit);
+
                     break;
                 case 0:
                     inicioMenu();

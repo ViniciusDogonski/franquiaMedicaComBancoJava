@@ -56,6 +56,65 @@ public class PessoaDAO {
 
     }
 
+    
+        public List<Pessoa> listaDePessoasTipoPaciente(List<TipoPessoa> tipoUserBanco) {
+
+        List<Pessoa> listaRetorno = new ArrayList<>();
+
+        String sql = "select * from pessoa where tipoUsuarioId = 1";
+
+        try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+//nome, endereco,CPF,telefone,login,senha,tipoUsuarioId,dataCriacao,dataModificacao
+
+                int id = rs.getInt("id");
+                String nome = rs.getString("nome");
+                String endereco = rs.getString("endereco");
+                String cpf = rs.getString("CPF");
+                String telefone = rs.getString("telefone");
+                String login = rs.getString("login");
+                String senha = rs.getString("senha");
+                int idTipoUser = rs.getInt("tipoUsuarioId");
+
+                Timestamp timestampDataCriacao = Timestamp.valueOf(rs.getString("dataCriacao"));
+                LocalDateTime dataCriacao = timestampDataCriacao.toLocalDateTime();
+                Timestamp timestampDataModificacao = Timestamp.valueOf(rs.getString("dataModificacao"));
+                LocalDateTime dataModificacao = timestampDataModificacao.toLocalDateTime();
+
+                Pessoa novaPessoa = new Pessoa();
+
+                novaPessoa.setTipoUsuario(null);
+
+                for (TipoPessoa tipoPessoa : tipoUserBanco) {
+
+                    if (tipoPessoa.getId() == idTipoUser) {
+                        novaPessoa.setTipoUsuario(tipoPessoa);
+                    }
+
+                }
+
+                novaPessoa.setId(id);
+                novaPessoa.setNome(nome);
+                novaPessoa.setTelefone(telefone);
+                novaPessoa.setEndereco(endereco);
+                novaPessoa.setCpf(cpf);
+                novaPessoa.setLogin(login);
+                novaPessoa.setSenha(senha);
+                novaPessoa.setDataModificacao(dataModificacao);
+                novaPessoa.setDataCriacao(dataCriacao);
+
+                listaRetorno.add(novaPessoa);
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return listaRetorno;
+
+    }
+    
     public Pessoa addPessoaComTipo(Pessoa pessoaAdicionada) {
 
         String sql = "INSERT INTO pessoa"
