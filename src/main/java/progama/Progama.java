@@ -204,6 +204,43 @@ GROUP BY
             switch (pessoaAchada.getTipoUsuario().getTipo()) {
                 case "PACIENTE":
                     System.out.println("menu PACIENTE");
+                    int opc = -1;
+                    while (opc != 5) {
+                        StringBuilder txt = new StringBuilder();
+                        txt.append("1- CADASTRAR PESSOA");
+                        txt.append("2 - Editar PESSOA");
+                        txt.append("3- MOSTRAR CONSULTAS ");
+                        txt.append("4 - MOSTRAR PROCEDIMENTOS");
+                        txt.append("5 - sair");
+                        switch (opc) {
+
+                            case 1:
+                                Pessoa p = gui.cadastrarPessoa();
+                                pessoaDAO.addPessoaSemTipo(p);
+                                break;
+                            case 2:
+                                int idEdit = 0;
+
+                                System.out.print("id da pessoa:");
+                                idEdit = Integer.parseInt(scan.nextLine());
+
+                                Pessoa pessoaAchadaEdit = pessoaDAO.buscaPorID(idEdit, tipoUserBanco);
+                                Pessoa pessoaEdit = gui.cadastrarPessoa();
+
+                                pessoaEdit.setId(pessoaAchada.getID());
+                                pessoaEdit.setTipoUsuario(pessoaAchada.getTipoUsuario());
+
+                                pessoaDAO.alterarPessoa(pessoaEdit);
+                                break;
+                            case 3:
+                                int idPaciente = 0;
+                                System.out.println("Informe o id do paciente:");
+
+                            default:
+                                throw new AssertionError();
+                        }
+
+                    }
                     break;
                 case "MEDICO":
                     System.out.println("menu MEDICO");
@@ -485,14 +522,14 @@ GROUP BY
                     System.out.println("Por favor, informe o id da consulta:");
                     int idconsulta = Integer.parseInt(scan.nextLine());
                     Consulta consul = consultaDAO.buscaPorID(idconsulta);
+                    System.out.println(consul);
                     InfoConsulta info = gui.cadastraInfo(consul);
                     infoDAO.addInfoConsulta(info);
                     break;
                 case 22:
                     System.out.println("--------MOSTRAR INFORMACOES DAS CONSULTAS---------");
-                    System.out.println("Por favor, informe o id do medico:");
-                    int idmedico = Integer.parseInt(scan.nextLine());
-                   gui.mostrarInfoConsultas( infoDAO.InfoConsultasPorMedico(idmedico));
+                    //int idmedico = Integer.parseInt(scan.nextLine());
+                    gui.mostrarInfoConsultas(infoDAO.InfoConsultasPorMedico());
                     break;
                 case 23:
                     System.out.println("----------DELETE INFO CONSULTA-----------");
@@ -521,18 +558,19 @@ GROUP BY
                     EstadoConsulta estadoProcedimento = estadoConsultaDAO.buscaPorId(estadoProc);
                     Procedimento procCriado = gui.cadastraProcedimento(consultaProc, estadoProcedimento);
                     procedimentoDAO.addProcedimento(procCriado);
-                    
+
                     break;
-                case 26: 
+                case 26:
                     System.out.println("---------MOSTRAR PROCEDIMENTOS-----------");
                     gui.mostrarProcedimentos(procedimentoDAO.listarProcedimentos(estadoConsultaDAO, consultaDAO));
+                    break;
                 case 27:
                     System.out.println("----------DELETE PROCEDIMENTO-----------");
                     System.out.println("Por favor, informe o id do procedimento");
                     int idProcDel = Integer.parseInt(scan.nextLine());
                     procedimentoDAO.deleteProcedimento(idProcDel);
                     break;
-                case 28: 
+                case 28:
                     System.out.println("-------------EDITAR PROCEDIMENTO-----------");
                     System.out.println("Por favor, informe o id do procedimento:");
                     int idprocEdit = Integer.parseInt(scan.nextLine());

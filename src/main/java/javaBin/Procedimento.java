@@ -21,6 +21,14 @@ public class Procedimento {
     private LocalDateTime dataCriacao;
     private LocalDateTime dataModificacao;
 
+    public Procedimento() {
+        this.dataCriacao = LocalDateTime.now();
+        this.dataModificacao = LocalDateTime.now();
+    }
+
+    
+    
+    
     public int getId() {
         return id;
     }

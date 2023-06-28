@@ -127,7 +127,7 @@ public class ProcedimentoDAO {
     }
     public List<Procedimento> listarProcedimentos(EstadoConsultaDAO estadoDAO, ConsultaDAO consultaDAO){
         String sql = "select * from procedimento";
-        Procedimento procNovo = null;
+        Procedimento procNovo = new Procedimento();
         List<Procedimento> procedimentos = new ArrayList<>();
         try(Connection con = new ConnectionFactory().getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()){
             while(rs.next()){

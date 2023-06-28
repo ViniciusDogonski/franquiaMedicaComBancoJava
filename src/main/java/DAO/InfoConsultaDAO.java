@@ -43,9 +43,9 @@ public class InfoConsultaDAO {
         return lista;
     }
 
-    public List<InfoConsulta> InfoConsultasPorMedico(int idMedico) { //todas as info consultas de um medico
+    public List<InfoConsulta> InfoConsultasPorMedico() { //todas as info consultas de um medico
         List<InfoConsulta> infos = new ArrayList<>();
-        try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = createPreparedStatement(connection, idMedico); ResultSet rs = ps.executeQuery()) {
+        try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = createPreparedStatement(connection); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 int consultaId = rs.getInt("consultaId");
                 int idInfoConsulta = rs.getInt("idInfoConsulta");
@@ -69,11 +69,10 @@ public class InfoConsultaDAO {
         return infos;
     }
 
-    private PreparedStatement createPreparedStatement(Connection con, long id) throws SQLException {
-        String sql = "select * from infoconsulta ic inner join consulta c on ic.consultaId = c.idConsulta inner join medico m on m.idMedico = c.medicoId where c.idMedico = ?";
+    private PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+        String sql = "select * from infoconsulta";
 
         PreparedStatement ps = con.prepareStatement(sql);
-        ps.setLong(1, id);
         return ps;
     }
 
@@ -150,8 +149,8 @@ public class InfoConsultaDAO {
 
     public void alteraInfo(InfoConsulta info) {
         String sql = "UPDATE infoconsulta SET"
-                + "  consultaId = ?"
-                + "  descricao = ?"
+                + "  consultaId = ?,"
+                + "  descricao = ?,"
                 + "  dataModificacao = ?"
                 + "WHERE"
                 + "  idInfoConsulta = ?";
