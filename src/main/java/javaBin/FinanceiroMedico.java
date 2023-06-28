@@ -81,4 +81,9 @@ public class FinanceiroMedico {
         return dataModificacao;
     }
 
+    @Override
+    public String toString() {
+        return "FinanceiroMedico{" + "id=" + id + ", valor=" + valor + ", medico=" + medico + ", estado=" + estado + ", franquia=" + franquia + ", dataCriacao=" + dataCriacao + ", dataModificacao=" + dataModificacao + '}';
+    }
+
 }

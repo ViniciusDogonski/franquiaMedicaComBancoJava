@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javaBin.FinanceiroADM;
@@ -45,6 +46,51 @@ public class FinanceiroAdmDAO {
             System.out.println("add");
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir o registro financeiro: " + e.getMessage());
+        }
+    }
+
+    public void gerarFinanceiroADMdoMes(LocalDate dataAtual) {
+        int year = dataAtual.getYear();
+        int month = dataAtual.getMonthValue();
+
+        String sql = "SELECT u.idUnidade, f.idFranquia, 1000 + (0.05 * (SUM(c.valor) + IFNULL(SUM(p.valor), 0))) AS total_payment "
+                + "FROM franquia_medica.franquia f "
+                + "INNER JOIN franquia_medica.unidade u ON f.idFranquia = u.franquiaId "
+                + "LEFT JOIN franquia_medica.consulta c ON u.idUnidade = c.unidadeId "
+                + "LEFT JOIN franquia_medica.procedimento p ON c.idConsulta = p.consultaId "
+                + "WHERE YEAR(c.diaHorario) = ? AND MONTH(c.diaHorario) = ? "
+                + "GROUP BY u.idUnidade, f.idFranquia";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, year);
+            statement.setInt(2, month - 1);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    int idUnidade = resultSet.getInt("idUnidade");
+                    int idFranquia = resultSet.getInt("idFranquia");
+                    double totalPayment = resultSet.getDouble("total_payment");
+
+                    FinanceiroADM financeiroADM = new FinanceiroADM();
+                    TipoMovimentacao tipoMovimentacao = new TipoMovimentacao(2, null);
+                    financeiroADM.setTipoMovimentacao(tipoMovimentacao);
+                    financeiroADM.setValor(totalPayment);
+                    UnidadeFranquia unidadeFranquia = new UnidadeFranquia();
+                    unidadeFranquia.setId(idUnidade);
+                    financeiroADM.setUnidade(unidadeFranquia);
+                    financeiroADM.setDescriacao("pagamento administradora");
+                    Movimento mov = new Movimento(3, null);
+                    financeiroADM.setMovimento(mov);
+                    financeiroADM.setDataCriacao(dataAtual.atStartOfDay());
+                    financeiroADM.setDataModificacao(dataAtual.atStartOfDay());
+
+                    this.inserir(financeiroADM);
+                    
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao gerar o financeiro ADM do mês", e);
         }
     }
 

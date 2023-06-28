@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,59 @@ public class FinanceiroMedicoDAO {
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir o financeiro médico", e);
+        }
+    }
+
+    public void gerarFinanceiroMedicoMes(LocalDate dataAtual) {
+        LocalDate dataInicio = dataAtual.minusMonths(1);
+
+        String sql = "SELECT f.idFranquia, m.idMedico, SUM(c.valor * 0.7) AS total_payment "
+                + "FROM franquia_medica.franquia f "
+                + "INNER JOIN franquia_medica.unidade u ON f.idFranquia = u.franquiaId "
+                + "INNER JOIN franquia_medica.consulta c ON u.idUnidade = c.unidadeId "
+                + "INNER JOIN franquia_medica.medico m ON c.medicoId = m.idMedico "
+                + "WHERE c.diaHorario >= ? AND c.diaHorario < ? "
+                + "GROUP BY f.idFranquia, m.idMedico "
+                + "UNION "
+                + "SELECT f.idFranquia, m.idMedico, SUM(p.valor * 0.5) AS total_payment "
+                + "FROM franquia_medica.franquia f "
+                + "INNER JOIN franquia_medica.unidade u ON f.idFranquia = u.franquiaId "
+                + "INNER JOIN franquia_medica.consulta c ON u.idUnidade = c.unidadeId "
+                + "INNER JOIN franquia_medica.medico m ON c.medicoId = m.idMedico "
+                + "INNER JOIN franquia_medica.procedimento p ON c.idConsulta = p.consultaId "
+                + "WHERE p.diaHorario >= ? AND p.diaHorario < ? "
+                + "GROUP BY f.idFranquia, m.idMedico";
+
+        try (Connection connection = connectionFactory.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setObject(1, dataInicio);
+            statement.setObject(2, dataAtual);
+            statement.setObject(3, dataInicio);
+            statement.setObject(4, dataAtual);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    int idFranquia = resultSet.getInt("idFranquia");
+                    int idMedico = resultSet.getInt("idMedico");
+                    double totalPayment = resultSet.getDouble("total_payment");
+
+                    FinanceiroMedico financeiroMedico = new FinanceiroMedico();
+                    financeiroMedico.setValor(totalPayment);
+                    Medico medico = new Medico();
+                    medico.setId(idMedico);
+                    financeiroMedico.setMedico(medico);
+                    Franquia franquia = new Franquia();
+                    franquia.setId(idFranquia);
+                    financeiroMedico.setFranquia(franquia);
+                    financeiroMedico.setDataCriacao(dataAtual.atStartOfDay());
+                    financeiroMedico.setDataModificacao(dataAtual.atStartOfDay());
+
+                    this.inserir(financeiroMedico);
+               
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao gerar o financeiro médico do mês", e);
         }
     }
 

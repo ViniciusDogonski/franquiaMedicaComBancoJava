@@ -15,6 +15,7 @@ import DAO.PessoaDAO;
 import DAO.TipoMovimentacaoDAO;
 import DAO.TipoPessoaDAO;
 import DAO.UnidadeFranquiaDAO;
+import Relatorio.Relatorios;
 import UI.GUI;
 import connection.ConnectionFactory;
 import java.sql.Connection;
@@ -61,13 +62,14 @@ public class Progama {
     ConsultaDAO consultaDAO = new ConsultaDAO();
     FinanceiroAdmDAO financeiroAdmDAO = new FinanceiroAdmDAO();
     FinanceiroMedicoDAO financeiroMedicoDAO = new FinanceiroMedicoDAO();
+    Relatorios relatorioDAO = new Relatorios();
 
     List<TipoPessoa> tipoUserBanco = tipoPessoaDAO.listarTipos();
     List<EstadoConsulta> estadosConsulta = estadoConsultaDAO.listarEstadoConsulta();
     List<TipoMovimentacao> tiposMovimentacoes = tipoMovimentacaoDAO.listarTipos();
     List<Movimento> movimentosDoBanco = movimentoDAO.listarMovimentos();
 
-    LocalDate dataAtual = LocalDate.of(2023, 7, 2);
+    LocalDate dataAtual = LocalDate.of(2023, 11, 1);
 
     public Progama() {
 
@@ -77,77 +79,15 @@ public class Progama {
 
         if (primeiroDiaDoMes) {
             System.out.println("Hoje é o primeiro dia do mês.");
-            // gerarFinanceiroMedico();
+            // gerar financeiros;
 
-            //gerar pagamentos para medicos nas consultas
-            /*SELECT
-    f.idFranquia,
-    m.idMedico,
-    SUM(c.valor * 0.7) AS total_pagamento
-FROM
-    franquia_medica.franquia f
-    INNER JOIN franquia_medica.unidade u ON f.idFranquia = u.franquiaId
-    INNER JOIN franquia_medica.consulta c ON u.idUnidade = c.unidadeId
-    INNER JOIN franquia_medica.medico m ON c.medicoId = m.idMedico
-WHERE
-    c.diaHorario >= DATE_SUB('2023-11-01', INTERVAL 1 MONTH) AND c.diaHorario < '2023-11-01'
-GROUP BY
-    f.idFranquia, m.idMedico;*/
-            //gerar pagamentos para medicos nos procedimentos
-            /*SELECT
-    f.idFranquia,
-    m.idMedico,
-    SUM(p.valor * 0.5) AS total_paid_amount
-FROM
-    franquia f
-    INNER JOIN unidade u ON f.idFranquia = u.franquiaId
-    INNER JOIN consulta c ON u.idUnidade = c.unidadeId
-    INNER JOIN medico m ON c.medicoId = m.idMedico
-    INNER JOIN procedimento p ON c.idConsulta = p.consultaId
-WHERE
-    p.diaHorario >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) AND p.diaHorario < CURDATE()
-GROUP BY
-    f.idFranquia, m.idMedico;*/
- /*
-            
-            
-            SELECT
-    f.idFranquia,
-    m.idMedico,
-    SUM(c.valor * 0.7) AS total_payment
-FROM
-    franquia_medica.franquia f
-    INNER JOIN franquia_medica.unidade u ON f.idFranquia = u.franquiaId
-    INNER JOIN franquia_medica.consulta c ON u.idUnidade = c.unidadeId
-    INNER JOIN franquia_medica.medico m ON c.medicoId = m.idMedico
-WHERE
-    c.diaHorario >= DATE_SUB('2023-11-01', INTERVAL 1 MONTH) AND c.diaHorario < '2023-11-01'
-GROUP BY
-    f.idFranquia, m.idMedico
-
-UNION
-
-SELECT
-    f.idFranquia,
-    m.idMedico,
-    SUM(p.valor * 0.5) AS total_payment
-FROM
-    franquia_medica.franquia f
-    INNER JOIN franquia_medica.unidade u ON f.idFranquia = u.franquiaId
-    INNER JOIN franquia_medica.consulta c ON u.idUnidade = c.unidadeId
-    INNER JOIN franquia_medica.medico m ON c.medicoId = m.idMedico
-    INNER JOIN franquia_medica.procedimento p ON c.idConsulta = p.consultaId
-WHERE
-    p.diaHorario >= DATE_SUB('2023-11-01', INTERVAL 1 MONTH) AND p.diaHorario < '2023-11-01'
-GROUP BY
-    f.idFranquia, m.idMedico;
-            
-            
-            
-            
-            
-             */
+            //financeiroMedicoDAO.gerarFinanceiroMedicoMes(dataAtual);
+            //financeiroAdmDAO.gerarFinanceiroADMdoMes(dataAtual);
         }
+        relatorioDAO.gerarRelatorioUnidade(7);
+        relatorioDAO.gerarRelatorioFranquia(4);
+        relatorioDAO.gerarRelatorioConsultasFranquiasPaciente(7);
+        relatorioDAO.gerarRelatorioValoresMedico(15);
 
         this.inicioMenu();
     }
