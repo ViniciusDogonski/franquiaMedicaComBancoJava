@@ -6,9 +6,13 @@ package progama;
 
 import DAO.ConsultaDAO;
 import DAO.EstadoConsultaDAO;
+import DAO.FinanceiroAdmDAO;
+import DAO.FinanceiroMedicoDAO;
 import DAO.FranquiaDAO;
 import DAO.MedicoDAO;
+import DAO.MovimentoDAO;
 import DAO.PessoaDAO;
+import DAO.TipoMovimentacaoDAO;
 import DAO.TipoPessoaDAO;
 import DAO.UnidadeFranquiaDAO;
 import UI.GUI;
@@ -17,6 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,10 +30,13 @@ import java.util.Map;
 import java.util.Scanner;
 import javaBin.Consulta;
 import javaBin.EstadoConsulta;
+import javaBin.FinanceiroADM;
 import javaBin.Medico;
 import javaBin.Pessoa;
 import javaBin.TipoPessoa;
 import javaBin.Franquia;
+import javaBin.Movimento;
+import javaBin.TipoMovimentacao;
 import javaBin.UnidadeFranquia;
 
 /**
@@ -47,35 +55,105 @@ public class Progama {
     MedicoDAO medicoDAO = new MedicoDAO();
     FranquiaDAO franquiaDAO = new FranquiaDAO();
     UnidadeFranquiaDAO unidadeFranquiaDAO = new UnidadeFranquiaDAO();
-
+    TipoMovimentacaoDAO tipoMovimentacaoDAO = new TipoMovimentacaoDAO();
+    MovimentoDAO movimentoDAO = new MovimentoDAO();
     EstadoConsultaDAO estadoConsultaDAO = new EstadoConsultaDAO();
     ConsultaDAO consultaDAO = new ConsultaDAO();
+    FinanceiroAdmDAO financeiroAdmDAO = new FinanceiroAdmDAO();
+    FinanceiroMedicoDAO financeiroMedicoDAO = new FinanceiroMedicoDAO();
 
     List<TipoPessoa> tipoUserBanco = tipoPessoaDAO.listarTipos();
     List<EstadoConsulta> estadosConsulta = estadoConsultaDAO.listarEstadoConsulta();
+    List<TipoMovimentacao> tiposMovimentacoes = tipoMovimentacaoDAO.listarTipos();
+    List<Movimento> movimentosDoBanco = movimentoDAO.listarMovimentos();
+
+    LocalDate dataAtual = LocalDate.of(2023, 7, 2);
 
     public Progama() {
+
+        System.out.println("Data atual: " + dataAtual);
+
+        boolean primeiroDiaDoMes = dataAtual.getDayOfMonth() == 1;
+
+        if (primeiroDiaDoMes) {
+            System.out.println("Hoje é o primeiro dia do mês.");
+            // gerarFinanceiroMedico();
+
+            //gerar pagamentos para medicos nas consultas
+            /*SELECT
+    f.idFranquia,
+    m.idMedico,
+    SUM(c.valor * 0.7) AS total_pagamento
+FROM
+    franquia_medica.franquia f
+    INNER JOIN franquia_medica.unidade u ON f.idFranquia = u.franquiaId
+    INNER JOIN franquia_medica.consulta c ON u.idUnidade = c.unidadeId
+    INNER JOIN franquia_medica.medico m ON c.medicoId = m.idMedico
+WHERE
+    c.diaHorario >= DATE_SUB('2023-11-01', INTERVAL 1 MONTH) AND c.diaHorario < '2023-11-01'
+GROUP BY
+    f.idFranquia, m.idMedico;*/
+            //gerar pagamentos para medicos nos procedimentos
+            /*SELECT
+    f.idFranquia,
+    m.idMedico,
+    SUM(p.valor * 0.5) AS total_paid_amount
+FROM
+    franquia f
+    INNER JOIN unidade u ON f.idFranquia = u.franquiaId
+    INNER JOIN consulta c ON u.idUnidade = c.unidadeId
+    INNER JOIN medico m ON c.medicoId = m.idMedico
+    INNER JOIN procedimento p ON c.idConsulta = p.consultaId
+WHERE
+    p.diaHorario >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) AND p.diaHorario < CURDATE()
+GROUP BY
+    f.idFranquia, m.idMedico;*/
+ /*
+            
+            
+            SELECT
+    f.idFranquia,
+    m.idMedico,
+    SUM(c.valor * 0.7) AS total_payment
+FROM
+    franquia_medica.franquia f
+    INNER JOIN franquia_medica.unidade u ON f.idFranquia = u.franquiaId
+    INNER JOIN franquia_medica.consulta c ON u.idUnidade = c.unidadeId
+    INNER JOIN franquia_medica.medico m ON c.medicoId = m.idMedico
+WHERE
+    c.diaHorario >= DATE_SUB('2023-11-01', INTERVAL 1 MONTH) AND c.diaHorario < '2023-11-01'
+GROUP BY
+    f.idFranquia, m.idMedico
+
+UNION
+
+SELECT
+    f.idFranquia,
+    m.idMedico,
+    SUM(p.valor * 0.5) AS total_payment
+FROM
+    franquia_medica.franquia f
+    INNER JOIN franquia_medica.unidade u ON f.idFranquia = u.franquiaId
+    INNER JOIN franquia_medica.consulta c ON u.idUnidade = c.unidadeId
+    INNER JOIN franquia_medica.medico m ON c.medicoId = m.idMedico
+    INNER JOIN franquia_medica.procedimento p ON c.idConsulta = p.consultaId
+WHERE
+    p.diaHorario >= DATE_SUB('2023-11-01', INTERVAL 1 MONTH) AND p.diaHorario < '2023-11-01'
+GROUP BY
+    f.idFranquia, m.idMedico;
+            
+            
+            
+            
+            
+             */
+        }
+
         this.inicioMenu();
     }
 
     public void inicioMenu() {
 
-        /* Pessoa pessoaTest = new Pessoa();
-        pessoaTest.setId(13);
-        pessoaTest.setNome("testAlter");
-        pessoaTest.setCpf("12345678000");
-        pessoaTest.setLogin("dsad");
-        pessoaTest.setSenha("123");
-        pessoaTest.setEndereco("erede");
-        pessoaTest.setTelefone("123123");
-
-        pessoaDAO.alterarPessoa(pessoaTest);*/
- /*pessoaDAO.addPessoa(pessoaTest);*/
- /*List<Pessoa> retornolistaesoa = pessoaDAO.listaDePessoas(tipoUserBanco);
-
-        for (Pessoa pessoa : retornolistaesoa) {
-            System.out.println(pessoa);
-        }*/
         int op = gui.pegaOpcaoLoginCadastro();
 
         switch (op) {
@@ -341,6 +419,11 @@ public class Progama {
 
                     consultaDAO.addConsulta(consultaAdd);
 
+                    FinanceiroADM financeiro = new FinanceiroADM();
+                    financeiro.setDescriacao("consulta");
+                    financeiro.setUnidade(consultaAdd.getUnidade());
+                    financeiro.setValor(consultaAdd.getValor());
+                    financeiroAdmDAO.inserirConsulta(financeiro);
                     break;
 
                 case 18:
