@@ -16,6 +16,8 @@ import DAO.TipoMovimentacaoDAO;
 import DAO.TipoPessoaDAO;
 import DAO.UnidadeFranquiaDAO;
 import Relatorio.Relatorios;
+import DAO.InfoConsultaDAO;
+import DAO.ProcedimentoDAO;
 import UI.GUI;
 import connection.ConnectionFactory;
 import java.sql.Connection;
@@ -36,7 +38,9 @@ import javaBin.Medico;
 import javaBin.Pessoa;
 import javaBin.TipoPessoa;
 import javaBin.Franquia;
+import javaBin.InfoConsulta;
 import javaBin.Movimento;
+import javaBin.Procedimento;
 import javaBin.TipoMovimentacao;
 import javaBin.UnidadeFranquia;
 
@@ -63,6 +67,8 @@ public class Progama {
     FinanceiroAdmDAO financeiroAdmDAO = new FinanceiroAdmDAO();
     FinanceiroMedicoDAO financeiroMedicoDAO = new FinanceiroMedicoDAO();
     Relatorios relatorioDAO = new Relatorios();
+    InfoConsultaDAO infoDAO = new InfoConsultaDAO();
+    ProcedimentoDAO procedimentoDAO = new ProcedimentoDAO();
 
     List<TipoPessoa> tipoUserBanco = tipoPessoaDAO.listarTipos();
     List<EstadoConsulta> estadosConsulta = estadoConsultaDAO.listarEstadoConsulta();
@@ -138,6 +144,43 @@ public class Progama {
             switch (pessoaAchada.getTipoUsuario().getTipo()) {
                 case "PACIENTE":
                     System.out.println("menu PACIENTE");
+                    int opc = -1;
+                    while (opc != 5) {
+                        StringBuilder txt = new StringBuilder();
+                        txt.append("1- CADASTRAR PESSOA");
+                        txt.append("2 - Editar PESSOA");
+                        txt.append("3- MOSTRAR CONSULTAS ");
+                        txt.append("4 - MOSTRAR PROCEDIMENTOS");
+                        txt.append("5 - sair");
+                        switch (opc) {
+
+                            case 1:
+                                Pessoa p = gui.cadastrarPessoa();
+                                pessoaDAO.addPessoaSemTipo(p);
+                                break;
+                            case 2:
+                                int idEdit = 0;
+
+                                System.out.print("id da pessoa:");
+                                idEdit = Integer.parseInt(scan.nextLine());
+
+                                Pessoa pessoaAchadaEdit = pessoaDAO.buscaPorID(idEdit, tipoUserBanco);
+                                Pessoa pessoaEdit = gui.cadastrarPessoa();
+
+                                pessoaEdit.setId(pessoaAchada.getID());
+                                pessoaEdit.setTipoUsuario(pessoaAchada.getTipoUsuario());
+
+                                pessoaDAO.alterarPessoa(pessoaEdit);
+                                break;
+                            case 3:
+                                int idPaciente = 0;
+                                System.out.println("Informe o id do paciente:");
+
+                            default:
+                                throw new AssertionError();
+                        }
+
+                    }
                     break;
                 case "MEDICO":
                     System.out.println("menu MEDICO");
@@ -413,6 +456,73 @@ public class Progama {
 
                     consultaDAO.alterarConsulta(consultaEdit);
 
+                    break;
+                case 21:
+                    System.out.println("CRIAR INFO CONSULTA");
+                    System.out.println("Por favor, informe o id da consulta:");
+                    int idconsulta = Integer.parseInt(scan.nextLine());
+                    Consulta consul = consultaDAO.buscaPorID(idconsulta);
+                    System.out.println(consul);
+                    InfoConsulta info = gui.cadastraInfo(consul);
+                    infoDAO.addInfoConsulta(info);
+                    break;
+                case 22:
+                    System.out.println("--------MOSTRAR INFORMACOES DAS CONSULTAS---------");
+                    //int idmedico = Integer.parseInt(scan.nextLine());
+                    gui.mostrarInfoConsultas(infoDAO.InfoConsultasPorMedico());
+                    break;
+                case 23:
+                    System.out.println("----------DELETE INFO CONSULTA-----------");
+                    System.out.println("Por favor, informe o id da info consulta");
+                    int idInfo = Integer.parseInt(scan.nextLine());
+                    infoDAO.deleteInfoConsulta(idInfo);
+                    break;
+                case 24:
+                    System.out.println("---------EDITAR INFO CONSULTA---------");
+                    System.out.println("Por favor, informe o id da info consulta:");
+                    int idInfoNova = Integer.parseInt(scan.nextLine());
+                    System.out.println("Por favor, informe o id da consulta:");
+                    int idConsultaInfo = Integer.parseInt(scan.nextLine());
+                    Consulta consulNova = consultaDAO.buscaPorID(idConsultaInfo);
+                    InfoConsulta infoNova = gui.cadastraInfo(consulNova);
+                    infoNova.setId(idInfoNova);
+                    infoDAO.alteraInfo(infoNova);
+                    break;
+                case 25:
+                    System.out.println("---------CRIAR PROCEDIMENTO----------");
+                    System.out.println("Por favor, informe o id da consulta:");
+                    int idconsultaProc = Integer.parseInt(scan.nextLine());
+                    Consulta consultaProc = consultaDAO.buscaPorID(idconsultaProc);
+                    System.out.println("Por faovr, informe o id do estado do procedimento");
+                    int estadoProc = Integer.parseInt(scan.nextLine());
+                    EstadoConsulta estadoProcedimento = estadoConsultaDAO.buscaPorId(estadoProc);
+                    Procedimento procCriado = gui.cadastraProcedimento(consultaProc, estadoProcedimento);
+                    procedimentoDAO.addProcedimento(procCriado);
+
+                    break;
+                case 26:
+                    System.out.println("---------MOSTRAR PROCEDIMENTOS-----------");
+                    gui.mostrarProcedimentos(procedimentoDAO.listarProcedimentos(estadoConsultaDAO, consultaDAO));
+                    break;
+                case 27:
+                    System.out.println("----------DELETE PROCEDIMENTO-----------");
+                    System.out.println("Por favor, informe o id do procedimento");
+                    int idProcDel = Integer.parseInt(scan.nextLine());
+                    procedimentoDAO.deleteProcedimento(idProcDel);
+                    break;
+                case 28:
+                    System.out.println("-------------EDITAR PROCEDIMENTO-----------");
+                    System.out.println("Por favor, informe o id do procedimento:");
+                    int idprocEdit = Integer.parseInt(scan.nextLine());
+                    System.out.println("Informe o id do estado do procedimento: ");
+                    int idEstadoEdit = Integer.parseInt(scan.nextLine());
+                    System.out.println("Informe o id da consulta:");
+                    int idConsultaProEdit = Integer.parseInt(scan.nextLine());
+                    Consulta consultaProEdit = consultaDAO.buscaPorID(idConsultaProEdit);
+                    EstadoConsulta estadoProEdit = estadoConsultaDAO.buscaPorId(idEstadoEdit);
+                    Procedimento procEdit = gui.cadastraProcedimento(consultaProEdit, estadoProEdit);
+                    procEdit.setId(idprocEdit);
+                    procedimentoDAO.alteraProcedimento(procEdit);
                     break;
                 case 0:
                     inicioMenu();

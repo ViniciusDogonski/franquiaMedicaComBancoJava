@@ -20,7 +20,7 @@ public class ConnectionFactory {
 
             Properties properties = new Properties();
             properties.setProperty("user", "root");
-            properties.setProperty("password", "db123");
+            properties.setProperty("password", "gabi");
            //properties.setProperty("password", "gabi");
             properties.setProperty("useTimezone", "true");
             properties.setProperty("serverTimezone", "UTC");

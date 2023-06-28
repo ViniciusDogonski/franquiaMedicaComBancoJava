@@ -257,6 +257,13 @@ VALUES ('2023-06-27 10:00:00', 1, 2, 3, 50.00, 4, '2023-06-27 09:00:00', '2023-0
         ps.setLong(1, id);
         return ps;
     }
+    private PreparedStatement createPreparedStatement2(Connection con, long id) throws SQLException {
+        String sql = "select medicoId from consulta where idPaciente = ?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setLong(1, id);
+        return ps;
+    }
+
 
     public Medico buscarMedicoPorConsulta(int idConsulta, List<Medico> medicos) {
        int medicoId=0;
@@ -277,5 +284,13 @@ VALUES ('2023-06-27 10:00:00', 1, 2, 3, 50.00, 4, '2023-06-27 09:00:00', '2023-0
         }
         return medico;
         }
-
+   /* public List<Consulta> ConsultasPorPaciente(int idPaciente){
+        String sql = "select * from consulta where pacienteId = ?";
+        Consulta consultaNova = new Consulta();
+        try(Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = createPreparedStatement2(connection, idPaciente); ResultSet rs = ps.executeQuery()){
+            
+        }catch(SQLException e){
+            throw new RuntimeException();
+        }
+    }*/
     }

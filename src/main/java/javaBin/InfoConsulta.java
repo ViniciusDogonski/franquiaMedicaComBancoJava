@@ -12,6 +12,11 @@ import java.time.LocalDateTime;
  */
 public class InfoConsulta {
 
+    public InfoConsulta() {
+        this.dataCriacao = LocalDateTime.now();
+        this.dataModificacao = LocalDateTime.now();
+    }
+
     public int getId() {
         return id;
     }
@@ -59,7 +64,7 @@ public class InfoConsulta {
 
     @Override
     public String toString() {
-        return "InfoConsulta{" + "id=" + id +","+ "\n"+ " consulta=" + consulta +"," + "\n"+ " descricao=" + descricao +"," + "\n"+ " dataCriacao=" + dataCriacao +"," + "\n"+" dataModificacao=" + dataModificacao + '}';
+        return "InfoConsulta{" + "id=" + id + "," + "\n" + " consulta=" + consulta + "," + "\n" + " descricao=" + descricao + "," + "\n" + " dataCriacao=" + dataCriacao + "," + "\n" + " dataModificacao=" + dataModificacao + '}';
     }
-    
+
 }

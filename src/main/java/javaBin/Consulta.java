@@ -105,7 +105,7 @@ public class Consulta {
 
     @Override
     public String toString() {
-        return "Consulta{" + "id=" + id + ", dataHora=" + dataHora + ", estado=" + estado.getId() + ", medico=" + medico.getId() + ", paciente=" + paciente.getId() + ", valor=" + valor + ", unidade=" + unidade.getId() + ", dataCriacao=" + dataCriacao + ", dataModificacao=" + dataModificacao + '}';
+        return "Consulta{" + "id=" + id + ", dataHora=" + dataHora + ", medico=" + medico.getId() + ", paciente=" + paciente.getId() + ", valor=" + valor + ", unidade=" + unidade.getId() + ", dataCriacao=" + dataCriacao + ", dataModificacao=" + dataModificacao + '}';
     }
 
 }
