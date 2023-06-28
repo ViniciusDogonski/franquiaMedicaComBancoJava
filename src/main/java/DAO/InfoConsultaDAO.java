@@ -22,6 +22,27 @@ import javaBin.InfoConsulta;
  */
 public class InfoConsultaDAO {
 
+    public List<InfoConsulta> ListaDeInfoConsultas() {
+        String sql = "SELECT * FROM infoconsulta";
+        InfoConsulta infoNova = new InfoConsulta();
+        List<InfoConsulta> lista = new ArrayList<>();
+        try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            infoNova.setConsulta(null);
+            infoNova.setDescricao(rs.getString("descricao"));
+            infoNova.setId(rs.getInt("idInfoConsulta"));
+            Timestamp timestampDataCriacao = Timestamp.valueOf(rs.getString("dataCriacao"));
+            LocalDateTime dataCriacao = timestampDataCriacao.toLocalDateTime();
+            Timestamp timestampDataModificacao = Timestamp.valueOf(rs.getString("dataModificacao"));
+            LocalDateTime dataModificacao = timestampDataModificacao.toLocalDateTime();
+            infoNova.setDataCriacao(dataCriacao);
+            infoNova.setDataModificacao(dataModificacao);
+            lista.add(infoNova);
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+        return lista;
+    }
+
     public List<InfoConsulta> InfoConsultasPorMedico(int idMedico) { //todas as info consultas de um medico
         List<InfoConsulta> infos = new ArrayList<>();
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement ps = createPreparedStatement(connection, idMedico); ResultSet rs = ps.executeQuery()) {
@@ -56,13 +77,13 @@ public class InfoConsultaDAO {
         return ps;
     }
 
-    public void addInfoConsulta(InfoConsulta info, Consulta consulta) {
+    public void addInfoConsulta(InfoConsulta info) {
         String sql = "INSERT INTO infoconsulta (consultaId, descricao,dataCriacao, dataModificacao)"
                 + "VALUES (?, ?, ?, ?)";
 
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
             // seta os valores
-            stmt.setInt(1, consulta.getId());
+            stmt.setInt(1, info.getConsulta().getId());
             stmt.setString(2, info.getDescricao());
             Timestamp timestamp = Timestamp.valueOf(info.getDataCriacao());
             java.sql.Date sqlDate = new java.sql.Date(timestamp.getTime());
@@ -113,23 +134,14 @@ public class InfoConsultaDAO {
         return infoconsulta;
     }
 
-    public void deleteInfoConsulta(int idInfo, List<Consulta> consultas) {
+    public void deleteInfoConsulta(int idInfo) {
         String sql = "DELETE FROM infoconsulta where idInfoConsulta = ?";
 
         try (Connection connection = new ConnectionFactory().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
             // seta os valores
-            Consulta consul = new Consulta();
-            InfoConsulta infoc = this.buscaPorId(idInfo, consultas);
-            consul = infoc.getConsulta();
-            if (consul.getEstado().getNome().equals("AGENDADA") || consul.getEstado().getNome().equals("CANCELADA")) {
-                System.out.println("apagada com sucesso");
-                stmt.execute();
-            } else {
-                System.out.println("essa info pertence a uma consulta realizada");
-            }
-            //consul.
-
-            System.out.println("info inserida com sucesso.");
+            stmt.setInt(1, idInfo);
+            stmt.execute();
+            System.out.println("info apagada com sucesso.");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -161,6 +173,6 @@ public class InfoConsultaDAO {
             throw new RuntimeException(e);
         }
 
-        }
-
     }
+
+}

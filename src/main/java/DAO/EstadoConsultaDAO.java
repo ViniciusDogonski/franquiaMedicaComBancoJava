@@ -46,5 +46,24 @@ public class EstadoConsultaDAO {
 
         return retornoEstadoConsulta;
     }
+    public EstadoConsulta buscaPorId(int estado){
+        //String sql = "select * from estado where idEstado = ?";
+        EstadoConsulta estadoNovo = new EstadoConsulta(0, "");
+        try(Connection con = new ConnectionFactory().getConnection(); PreparedStatement ps = createPreparedStatement(con, estado); ResultSet rs = ps.executeQuery()){
+            while(rs.next()){
+                estadoNovo.setId(rs.getInt("idEstado"));
+                estadoNovo.setNome(rs.getString("nome"));
+            }
+        }catch(SQLException e){
+            throw new RuntimeException();
+        }
+     return estadoNovo;
+    }
+    private PreparedStatement createPreparedStatement(Connection con, long id) throws SQLException {
+        String sql = "select * from estado where idEstado = ?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setLong(1, id);
+        return ps;
+    }
 
 }

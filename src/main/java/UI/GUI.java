@@ -16,6 +16,8 @@ import javaBin.Medico;
 import javaBin.Pessoa;
 import javaBin.Franquia;
 import javaBin.UnidadeFranquia;
+import javaBin.InfoConsulta;
+import javaBin.Procedimento;
 
 /**
  *
@@ -149,7 +151,7 @@ public class GUI {
         String dataConsulta = scan.nextLine();
         LocalDate data = DateConverter(dataConsulta);
 
-        System.out.print("hora da consulta (HH:mm):");
+        System.out.print("horario da consulta (HH:mm):");
         String horaConsulta = scan.nextLine();
         LocalTime horario = TimeConverter(horaConsulta);
 
@@ -182,6 +184,42 @@ public class GUI {
 
         return consulta;
 
+    }
+
+    public InfoConsulta cadastraInfo(Consulta consulta) {
+        InfoConsulta info = new InfoConsulta();
+        System.out.println("Descricao:");
+        info.setDescricao(scan.nextLine());
+        info.setConsulta(consulta);
+        return info;
+    }
+
+    public Procedimento cadastraProcedimento(Consulta consulta, EstadoConsulta estado) {
+        Procedimento procedimento = new Procedimento();
+        System.out.println("Nome:");
+        String nome = scan.nextLine();
+        System.out.println("Valor");
+        Double valor = Double.valueOf(scan.nextLine());
+        System.out.print("data do procedimento (dd/MM/yyyy):");
+        String dataProc = scan.nextLine();
+        LocalDate data = DateConverter(dataProc);
+
+        System.out.print("horario do procedimento (HH:mm):");
+        String horaProc = scan.nextLine();
+        LocalTime horario = TimeConverter(horaProc);
+
+        LocalDateTime localDateTime = data.atTime(horario);
+
+        procedimento.setDataHora(localDateTime);
+        System.out.println("laudo");
+        String laudo = scan.nextLine();
+        procedimento.setLaudo(laudo);
+        procedimento.setNome(nome);
+        procedimento.setValor(valor);
+        procedimento.setConsulta(consulta);
+        procedimento.setEstado(estado);
+
+        return procedimento;
     }
 
     public int pegaOpcaoLoginCadastro() {
@@ -284,6 +322,19 @@ public class GUI {
             System.out.println(consulta);
         }
 
+    }
+
+    public void mostrarInfoConsultas(List<InfoConsulta> infos) {
+
+        for (InfoConsulta info : infos) {
+            System.out.println(info);
+        }
+
+    }
+    public void mostrarProcedimentos(List<Procedimento> procedimentos){
+       for (Procedimento p : procedimentos) {
+            System.out.println(p);
+        }
     }
 
     private LocalDate DateConverter(String dataConsulta) {
